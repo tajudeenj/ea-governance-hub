@@ -1,0 +1,24 @@
+spring:
+  application.name: EA Governance Hub
+  datasource:
+    url: jdbc:h2:file:./work/ea-governance;AUTO_SERVER=TRUE
+    username: sa
+    password:
+  jpa:
+    hibernate.ddl-auto: update
+    open-in-view: false
+server:
+  port: ${PORT:8080}
+  servlet.session.cookie:
+    http-only: true
+    secure: ${COOKIE_SECURE:false}
+    same-site: strict
+management.endpoints.web.exposure.include: health,info
+---
+spring:
+  config.activate.on-profile: prod
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  jpa.hibernate.ddl-auto: update

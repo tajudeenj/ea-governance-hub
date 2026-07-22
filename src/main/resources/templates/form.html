@@ -1,0 +1,28 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Edit MPM CRM record</title><link rel="stylesheet" href="/css/app.css"></head>
+<body>
+<nav th:replace="~{fragments :: nav}"></nav>
+<main class="narrow">
+  <header><p class="eyebrow" th:text="${item.type}"></p><h1 th:text="${item.id==null?'Add record':'Edit record'}"></h1></header>
+  <form class="panel form" th:action="@{/catalog/save}" th:object="${item}" method="post">
+    <input type="hidden" th:field="*{id}">
+    <input type="hidden" th:field="*{type}">
+    <label>Name *<input th:field="*{name}" required maxlength="255"></label>
+    <label>Description<textarea th:field="*{description}" rows="4" maxlength="2000"></textarea></label>
+    <div class="grid">
+      <label>Project<select th:field="*{projectId}"><option value="">Enterprise-wide / unassigned</option><option th:each="p:${projects}" th:value="${p.id}" th:text="${p.name}"></option></select></label>
+      <label>Owner<input th:field="*{owner}"></label>
+      <label>Status<select th:field="*{status}"><option th:each="s:${statuses}" th:value="${s}" th:text="${s}"></option></select></label>
+      <label>Criticality<select th:field="*{criticality}">
+        <option value="">Select</option><option value="Low">Low</option><option value="Medium">Medium</option><option value="High">High</option><option value="Critical">Critical</option>
+      </select></label>
+      <label>Data classification<select th:field="*{classification}">
+        <option value="">Select</option><option value="Public">Public</option><option value="Internal">Internal</option><option value="Confidential">Confidential</option><option value="Restricted">Restricted</option>
+      </select></label>
+      <label>Review date<input type="date" th:field="*{targetDate}"></label>
+    </div>
+    <div class="actions"><button class="primary">Save record</button><a th:href="@{/catalog/{t}(t=${item.type})}">Cancel</a></div>
+  </form>
+</main>
+</body></html>
