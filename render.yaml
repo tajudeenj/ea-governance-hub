@@ -1,0 +1,47 @@
+services:
+  - type: web
+    name: ea-governance-hub
+    runtime: docker
+    plan: free
+    region: frankfurt
+    autoDeployTrigger: commit
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: PORT
+        value: "10000"
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: EA_ADMIN_USER
+        value: admin
+      - key: EA_ADMIN_PASSWORD
+        generateValue: true
+      - key: DB_HOST
+        fromDatabase:
+          name: ea-governance-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: ea-governance-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: ea-governance-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: ea-governance-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: ea-governance-db
+          property: password
+
+databases:
+  - name: ea-governance-db
+    plan: free
+    region: frankfurt
+    databaseName: ea_governance
+    user: ea_governance
+
