@@ -52,6 +52,19 @@ $env:EA_ADMIN_PASSWORD="test-only-password"
 mvn test
 ```
 
+## Deploy a public demo on Render
+
+The repository includes a Dockerfile and `render.yaml` Blueprint for a Spring Boot web service with PostgreSQL.
+
+1. Sign in to [Render](https://dashboard.render.com/) using GitHub.
+2. Select **New â†’ Blueprint**.
+3. Connect `tajudeenj/ea-governance-hub`.
+4. Render reads `render.yaml`; review the web service and PostgreSQL database, then select **Deploy Blueprint**.
+5. After deployment, open the web service's **Environment** page and reveal/copy the generated `EA_ADMIN_PASSWORD`.
+6. Open the assigned `https://...onrender.com` URL and sign in as `admin`.
+
+The free service can sleep when idle and its first request after sleep can take about a minute. Free Render PostgreSQL is intended for demonstrations and expires after the period defined by Render's current free-tier policy.
+
 ## Production considerations
 
 This repository is a working MVP, not a production-certified banking platform. A production rollout should add:
@@ -78,3 +91,4 @@ This repository is a working MVP, not a production-certified banking platform. A
 ## License
 
 MIT
+
