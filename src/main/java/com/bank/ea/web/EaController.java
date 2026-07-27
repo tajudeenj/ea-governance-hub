@@ -38,6 +38,9 @@ public class EaController {
     model.addAttribute("counts", counts);
     model.addAttribute("approved", items.countByStatus(CatalogItem.Status.APPROVED));
     model.addAttribute("deprecated", items.countByStatus(CatalogItem.Status.DEPRECATED));
+    model.addAttribute("rejected", items.countByStatus(CatalogItem.Status.REJECTED));
+    model.addAttribute("rework", items.countByStatus(CatalogItem.Status.RETURNED_FOR_REWORK));
+    model.addAttribute("exceptions", items.countByStatus(CatalogItem.Status.EXCEPTION_GRANTED));
     model.addAttribute("recent", audits.findTop100ByOrderByOccurredAtDesc().stream().limit(8).toList());
     return "dashboard";
   }
@@ -84,12 +87,16 @@ public class EaController {
       record.setCriticality(submitted.getCriticality());
       record.setClassification(submitted.getClassification());
       record.setTargetDate(submitted.getTargetDate());
+      copyGovernanceFields(submitted, record);
       record.setProject(selectedProject);
     }
 
     CatalogItem saved = items.save(record);
+    String decisionDetail = saved.getDecision() == null ? "" :
+        " | " + saved.getReviewAuthority() + " decision: " + saved.getDecision();
     audits.save(new AuditEvent(principal.getName(), fresh ? "CREATE" : "UPDATE",
-        saved.getType().name(), saved.getId().toString(), saved.getName() + " -> " + saved.getStatus()));
+        saved.getType().name(), saved.getId().toString(),
+        saved.getName() + " -> " + saved.getStatus() + decisionDetail));
     flash.addFlashAttribute("message", "Saved successfully");
     return "redirect:/catalog/" + saved.getType();
   }
@@ -102,6 +109,20 @@ public class EaController {
   private void prepareForm(Model model, CatalogItem item) {
     model.addAttribute("item", item);
     model.addAttribute("statuses", CatalogItem.Status.values());
+    model.addAttribute("authorities", CatalogItem.ReviewAuthority.values());
+    model.addAttribute("decisions", CatalogItem.Decision.values());
     model.addAttribute("projects", projects.findAllByOrderByUpdatedAtDesc());
   }
+
+  private void copyGovernanceFields(CatalogItem s, CatalogItem t) {
+    t.setReviewAuthority(s.getReviewAuthority()); t.setDecision(s.getDecision());
+    t.setDecisionReason(s.getDecisionReason()); t.setLikelihood(s.getLikelihood()); t.setImpact(s.getImpact());
+    t.setRemediationAction(s.getRemediationAction()); t.setActionOwner(s.getActionOwner());
+    t.setActionDueDate(s.getActionDueDate()); t.setEvidenceLink(s.getEvidenceLink());
+    t.setResubmissionDate(s.getResubmissionDate()); t.setExceptionRequested(Boolean.TRUE.equals(s.getExceptionRequested()));
+    t.setExceptionApprover(s.getExceptionApprover()); t.setExceptionExpiryDate(s.getExceptionExpiryDate());
+    t.setEscalationAuthority(s.getEscalationAuthority()); t.setEscalationStatus(s.getEscalationStatus());
+    t.setClosureEvidence(s.getClosureEvidence());
+  }
 }
+
