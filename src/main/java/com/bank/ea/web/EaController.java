@@ -91,6 +91,7 @@ public class EaController {
       record.setProject(selectedProject);
     }
 
+    applyDecisionStatus(record);
     CatalogItem saved = items.save(record);
     String decisionDetail = saved.getDecision() == null ? "" :
         " | " + saved.getReviewAuthority() + " decision: " + saved.getDecision();
@@ -123,6 +124,18 @@ public class EaController {
     t.setExceptionApprover(s.getExceptionApprover()); t.setExceptionExpiryDate(s.getExceptionExpiryDate());
     t.setEscalationAuthority(s.getEscalationAuthority()); t.setEscalationStatus(s.getEscalationStatus());
     t.setClosureEvidence(s.getClosureEvidence());
+  }
+
+  private void applyDecisionStatus(CatalogItem item) {
+    if (item.getDecision() == null || item.getDecision() == CatalogItem.Decision.PENDING) return;
+    item.setStatus(switch (item.getDecision()) {
+      case APPROVED -> CatalogItem.Status.APPROVED;
+      case CONDITIONALLY_APPROVED -> CatalogItem.Status.CONDITIONALLY_APPROVED;
+      case REJECTED -> CatalogItem.Status.REJECTED;
+      case RETURNED_FOR_REWORK -> CatalogItem.Status.RETURNED_FOR_REWORK;
+      case EXCEPTION_GRANTED -> CatalogItem.Status.EXCEPTION_GRANTED;
+      case PENDING -> item.getStatus();
+    });
   }
 }
 
