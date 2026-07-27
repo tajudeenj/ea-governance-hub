@@ -35,4 +35,24 @@ class EaGovernanceApplicationTests {
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectedUrl("/catalog/APPLICATION"));
   }
+
+  @Test @WithMockUser(roles={"ADMIN","ARCHITECT"})
+  void riskCanCaptureGisdRejectionAndRemediation() throws Exception {
+    Long id = jdbc.queryForObject("select id from catalog_items where name = ?", Long.class,
+        "Excessive Dynamics privileges");
+    mvc.perform(post("/catalog/save").with(csrf())
+        .param("id", id.toString()).param("type", "RISK")
+        .param("name", "Excessive Dynamics privileges").param("description", "Privileged access risk")
+        .param("owner", "Information Security").param("status", "REJECTED")
+        .param("criticality", "Critical").param("classification", "Restricted")
+        .param("targetDate", "2026-09-15").param("reviewAuthority", "GISD")
+        .param("decision", "REJECTED").param("decisionReason", "Segregation of duties is insufficient")
+        .param("likelihood", "Likely").param("impact", "Severe")
+        .param("remediationAction", "Redesign privileged roles").param("actionOwner", "CRM Security Lead")
+        .param("actionDueDate", "2026-08-30").param("exceptionRequested", "true"))
+        .andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/catalog/RISK"));
+    mvc.perform(get("/catalog/RISK/{id}", id)).andExpect(status().isOk())
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("Segregation of duties is insufficient")));
+  }
 }
+
