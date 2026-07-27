@@ -22,7 +22,28 @@
       </select></label>
       <label>Review date<input type="date" th:field="*{targetDate}"></label>
     </div>
+    <section class="governance" th:if="${item.type.name() == 'RISK' or item.type.name() == 'REVIEW'}">
+      <h2>EA / GISD governance decision</h2>
+      <p class="muted">Capture rejected or conditional decisions, remediation, exceptions and closure evidence.</p>
+      <div class="grid">
+        <label>Review authority<select th:field="*{reviewAuthority}"><option value="">Select</option><option th:each="a:${authorities}" th:value="${a}" th:text="${a}"></option></select></label>
+        <label>Decision<select th:field="*{decision}"><option value="">Select</option><option th:each="d:${decisions}" th:value="${d}" th:text="${d}"></option></select></label>
+        <label>Likelihood<select th:field="*{likelihood}"><option value="">Select</option><option>Rare</option><option>Unlikely</option><option>Possible</option><option>Likely</option><option>Almost Certain</option></select></label>
+        <label>Impact<select th:field="*{impact}"><option value="">Select</option><option>Insignificant</option><option>Minor</option><option>Moderate</option><option>Major</option><option>Severe</option></select></label>
+      </div>
+      <label>Decision reason / conditions<textarea th:field="*{decisionReason}" rows="3"></textarea></label>
+      <label>Required remediation action<textarea th:field="*{remediationAction}" rows="3"></textarea></label>
+      <div class="grid">
+        <label>Action owner<input th:field="*{actionOwner}"></label><label>Action due date<input type="date" th:field="*{actionDueDate}"></label>
+        <label>Evidence link<input type="url" th:field="*{evidenceLink}" placeholder="https://..."></label><label>Resubmission date<input type="date" th:field="*{resubmissionDate}"></label>
+        <label>Escalation authority<input th:field="*{escalationAuthority}"></label><label>Escalation status<select th:field="*{escalationStatus}"><option value="">Not escalated</option><option>Requested</option><option>In Review</option><option>Resolved</option></select></label>
+      </div>
+      <label class="check"><input type="checkbox" th:field="*{exceptionRequested}"> Exception / waiver requested</label>
+      <div class="grid"><label>Exception approver<input th:field="*{exceptionApprover}"></label><label>Exception expiry date<input type="date" th:field="*{exceptionExpiryDate}"></label></div>
+      <label>Closure evidence<textarea th:field="*{closureEvidence}" rows="3"></textarea></label>
+    </section>
     <div class="actions"><button class="primary">Save record</button><a th:href="@{/catalog/{t}(t=${item.type})}">Cancel</a></div>
   </form>
 </main>
 </body></html>
+
